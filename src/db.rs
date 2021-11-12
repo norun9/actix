@@ -1,4 +1,4 @@
-use crate::errors::InternalError
+use crate::errors::InternalError;
 use diesel::mysql::MysqlConnection;
 use diesel::prelude::*;
 use dotenv::dotenv;
