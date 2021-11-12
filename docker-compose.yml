@@ -1,19 +1,25 @@
-version: "3"
-
+version: "3.7"
 services:
-  # MySQL
   db:
     image: mysql:5.7
-    container_name: actix_db
     environment:
-      MYSQL_DATABASE: testdb
-      MYSQL_USER: test
-      MYSQL_PASSWORD: password
-      TZ: "Asia/Tokyo"
-    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
-    volumes:
-      - ./docker/db/data:/var/lib/mysql
-      - ./docker/db/my.cnf:/etc/mysql/conf.d/my.cnf
-      - ./docker/db/sql:/docker-entrypoint-initdb.d
+      MYSQL_ROOT_PASSWORD: password
     ports:
       - 5306:3306
+    volumes:
+      - ./docker/mysql:/var/lib/mysql
+    container_name: actix-db
+  dev:
+    image: rust:latest
+    working_dir: /actix-app
+    environment:
+      USER: root
+    volumes:
+      - ./:/actix-app
+    tty: true
+    depends_on:
+      - db
+    container_name: actix-dev
+    # build:
+    #   context: .
+    #   dockerfile: ./docker/rust/Dockerfile
