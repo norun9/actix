@@ -1,5 +1,8 @@
-use crate::pkg::db;
+use crate::db;
+use crate::errors::InternalError;
 use crate::schema::posts;
+use diesel::{self, prelude::*};
+use serde::{Deserialize, Serialize};
 
 /// This represents a post pulled from the database, including the auto-generated fields
 #[derive(Serialize, Deserialize, Queryable)]
@@ -7,8 +10,6 @@ pub struct Post {
     pub id: i32,
     pub title: String,
     pub body: String,
-    pub created_at: DateTime<Local>,
-    pub updated_at: DateTime<Local>,
 }
 
 /// This represents a post being inserted into the database, without the auto-generated fields
@@ -28,7 +29,7 @@ pub struct NewPost<'a> {
 
 impl Post {
     pub fn index() -> Result<Vec<Self>, InternalError> {
-        let conn = db::cnn()?;
+        let cnn = db::cnn();
 
         let posts = posts::dsl::posts
             .load::<Post>(&cnn)
