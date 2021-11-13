@@ -1,7 +1,6 @@
 use crate::pkg;
 use crate::post::model;
-
-use actix_web::{format, get, post, web, HttpResponse};
+use actix_web::{get, post, web, HttpResponse};
 
 type PostResult = Result<HttpResponse, pkg::InternalError>;
 
@@ -17,13 +16,14 @@ async fn find(id: web::Path<i32>) -> PostResult {
     Ok(HttpResponse::Ok().json(post))
 }
 
-#[post("/posts", format = "application/json", data = "<new_post>")]
-pub fn create(new_post: web::Json<model::NewPost>) -> PostResult {
-    let post_id = model::Post::create(&(new_post));
-    Ok(HttpResponse::Ok().json(post_id))
+#[post("/posts")]
+async fn create(new_post: web::Json<model::NewPost>) -> PostResult {
+    let result = model::Post::create(new_post.into_inner());
+    Ok(HttpResponse::Ok().json(result.ok()))
 }
 
 pub fn init_routes(cfg: &mut web::ServiceConfig) {
     cfg.service(index);
     cfg.service(find);
+    cfg.service(create);
 }

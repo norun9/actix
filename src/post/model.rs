@@ -14,21 +14,10 @@ pub struct Post {
 /// This represents a post being inserted into the database, without the auto-generated fields
 #[derive(Deserialize, Insertable)]
 #[table_name = "posts_schema"]
-pub struct InsertPost {
-    pub title: String,
-    pub body: String,
-}
-
-#[derive(Insertable)]
-#[table_name = "posts_schema"]
 pub struct NewPost {
     title: String,
     body: String,
 }
-// pub struct NewPost<'a> {
-//     title: &'a str,
-//     body: &'a str,
-// }
 
 impl Post {
     pub fn index() -> Result<Vec<Self>, pkg::InternalError> {
@@ -39,7 +28,7 @@ impl Post {
         Ok(posts)
     }
 
-    pub fn find(&self, id: i32) -> Result<Self, pkg::InternalError> {
+    pub fn find(id: i32) -> Result<Self, pkg::InternalError> {
         let cnn = pkg::db_connection();
         let post = posts_schema::dsl::posts
             .filter(posts_schema::id.eq(id))
@@ -48,12 +37,17 @@ impl Post {
         Ok(post)
     }
 
-    pub fn create(&self, new_post: NewPost) -> Result<Self, pkg::InternalError> {
+    pub fn create(new_post: NewPost) -> Result<Self, pkg::InternalError> {
         let cnn = pkg::db_connection();
-        let new_post_id = diesel::insert_into(posts_schema::dsl::posts)
+        let _ = diesel::insert_into(posts_schema::dsl::posts)
             .values(&new_post)
             .execute(&cnn)
-            .expect("Error saving posts") as i32;
-        self.find(new_post_id)
+            .expect("Error saving posts");
+
+        let new_post = posts_schema::dsl::posts
+            .order(posts_schema::id.desc())
+            .first::<Post>(&cnn)
+            .expect("Error loading posts");
+        Ok(new_post)
     }
 }
