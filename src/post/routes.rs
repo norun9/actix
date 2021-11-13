@@ -17,18 +17,14 @@ async fn find(id: web::Path<i32>) -> PostResult {
 }
 
 #[post("/posts")]
-async fn create(new_post: web::Json<model::NewPost>) -> PostResult {
+async fn create(new_post: web::Json<model::InsertPost>) -> PostResult {
     let result = model::Post::create(new_post.into_inner());
     Ok(HttpResponse::Ok().json(result.unwrap()))
 }
 
 #[put("/posts")]
-async fn update(
-    id: web::Path<i32>,
-    title: web::Path<String>,
-    body: web::Path<String>,
-) -> PostResult {
-    let result = model::Post::update(id.into_inner(), title.into_inner(), body.into_inner());
+async fn update(target: web::Json<model::UpdatePost>) -> PostResult {
+    let result = model::Post::update(target.into_inner());
     Ok(HttpResponse::Ok().json(result.unwrap()))
 }
 
