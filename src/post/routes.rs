@@ -32,7 +32,7 @@ async fn update(target: web::Json<model::UpdatePost>) -> PostResult {
 #[delete("/posts/{id}")]
 async fn delete(id: web::Path<i32>) -> PostResult {
     let num_deleted = model::Post::delete(id.into_inner())?;
-    Ok(HttpResponse::Ok().json(json!({ "delete": num_deleted })))
+    Ok(HttpResponse::Ok().json(json!({ "deleted": num_deleted })))
 }
 
 pub fn init_routes(cfg: &mut web::ServiceConfig) {
