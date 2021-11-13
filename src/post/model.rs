@@ -67,7 +67,15 @@ impl Post {
                 posts_schema::body.eq(target.body),
             ))
             .execute(&cnn)
-            .expect("Error updating users");
+            .expect("Error updating posts");
         Ok(Post::find(target.id).unwrap())
+    }
+
+    pub fn delete(id: i32) -> Result<usize, pkg::InternalError> {
+        let cnn = pkg::db_connection();
+        let num_deleted = diesel::delete(posts_schema::dsl::posts.find(id))
+            .execute(&cnn)
+            .expect("Error deleting posts");
+        Ok(num_deleted)
     }
 }

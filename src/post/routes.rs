@@ -1,6 +1,7 @@
 use crate::pkg;
 use crate::post::model;
-use actix_web::{get, post, put, web, HttpResponse};
+use actix_web::{delete, get, post, put, web, HttpResponse};
+use serde_json::json;
 
 type PostResult = Result<HttpResponse, pkg::InternalError>;
 
@@ -28,9 +29,16 @@ async fn update(target: web::Json<model::UpdatePost>) -> PostResult {
     Ok(HttpResponse::Ok().json(result.unwrap()))
 }
 
+#[delete("/posts/{id}")]
+async fn delete(id: web::Path<i32>) -> PostResult {
+    let num_deleted = model::Post::delete(id.into_inner())?;
+    Ok(HttpResponse::Ok().json(json!({ "deleted": num_deleted })))
+}
+
 pub fn init_routes(cfg: &mut web::ServiceConfig) {
     cfg.service(index);
     cfg.service(find);
     cfg.service(create);
     cfg.service(update);
+    cfg.service(delete);
 }
