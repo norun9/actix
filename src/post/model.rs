@@ -14,9 +14,17 @@ pub struct Post {
 /// This represents a post being inserted into the database, without the auto-generated fields
 #[derive(Deserialize, Insertable)]
 #[table_name = "posts_schema"]
-pub struct NewPost {
+pub struct InsertPost {
     title: String,
     body: String,
+}
+
+/// This represents a post being updated
+#[derive(Deserialize)]
+pub struct UpdatePost {
+    pub id: i32,
+    pub title: String,
+    pub body: String,
 }
 
 impl Post {
@@ -37,7 +45,7 @@ impl Post {
         Ok(post)
     }
 
-    pub fn create(new_post: NewPost) -> Result<Self, pkg::InternalError> {
+    pub fn create(new_post: InsertPost) -> Result<Self, pkg::InternalError> {
         let cnn = pkg::db_connection();
         let _ = diesel::insert_into(posts_schema::dsl::posts)
             .values(&new_post)
@@ -51,12 +59,23 @@ impl Post {
         Ok(new_post)
     }
 
-    pub fn update(id: i32, title: String, body: String) -> Result<Self, pkg::InternalError> {
+    pub fn update(target: UpdatePost) -> Result<Self, pkg::InternalError> {
         let cnn = pkg::db_connection();
-        let _ = diesel::update(posts_schema::dsl::posts.find(id))
-            .set((posts_schema::title.eq(title), posts_schema::body.eq(body)))
+        let _ = diesel::update(posts_schema::dsl::posts.find(target.id))
+            .set((
+                posts_schema::title.eq(target.title),
+                posts_schema::body.eq(target.body),
+            ))
             .execute(&cnn)
-            .expect("Error updating users");
-        Ok(Post::find(id).unwrap())
+            .expect("Error updating posts");
+        Ok(Post::find(target.id).unwrap())
+    }
+
+    pub fn delete(id: i32) -> Result<usize, pkg::InternalError> {
+        let cnn = pkg::db_connection();
+        let num_deleted = diesel::delete(posts_schema::dsl::posts.find(id))
+            .execute(&cnn)
+            .expect("Error deleting posts");
+        Ok(num_deleted)
     }
 }
