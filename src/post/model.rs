@@ -50,4 +50,13 @@ impl Post {
             .expect("Error loading posts");
         Ok(new_post)
     }
+
+    pub fn update(id: i32, title: String, body: String) -> Result<Self, pkg::InternalError> {
+        let cnn = pkg::db_connection();
+        let _ = diesel::update(posts_schema::dsl::posts.find(id))
+            .set((posts_schema::title.eq(title), posts_schema::body.eq(body)))
+            .execute(&cnn)
+            .expect("Error updating users");
+        Ok(Post::find(id).unwrap())
+    }
 }
