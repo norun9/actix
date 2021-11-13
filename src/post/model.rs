@@ -1,5 +1,4 @@
-use crate::db;
-use crate::errors::InternalError;
+use crate::pkg;
 use crate::schema::posts;
 use diesel::{self, prelude::*};
 use serde::{Deserialize, Serialize};
@@ -28,9 +27,8 @@ pub struct NewPost<'a> {
 }
 
 impl Post {
-    pub fn index() -> Result<Vec<Self>, InternalError> {
-        let cnn = db::cnn();
-
+    pub fn index() -> Result<Vec<Self>, pkg::InternalError> {
+        let cnn = pkg::db_connection();
         let posts = posts::dsl::posts
             .load::<Post>(&cnn)
             .expect("Error loading posts");

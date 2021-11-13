@@ -2,6 +2,5 @@
 extern crate diesel;
 extern crate dotenv;
 
-pub mod db;
-pub mod errors;
+pub mod pkg;
 pub mod schema;

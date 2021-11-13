@@ -1,11 +1,10 @@
-use crate::errors::InternalError;
+use crate::pkg;
 use crate::post::model::Post;
 
-use actix_web::{delete, get, post, put, web, HttpResponse};
-use serde_json::json;
+use actix_web::{get, web, HttpResponse};
 
 #[get("/posts")]
-async fn index() -> Result<HttpResponse, InternalError> {
+async fn index() -> Result<HttpResponse, pkg::InternalError> {
     let posts = Post::index()?;
     Ok(HttpResponse::Ok().json(posts))
 }
