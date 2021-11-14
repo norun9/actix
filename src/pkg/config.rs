@@ -22,11 +22,13 @@ pub struct DB {
     pub url: String,
 }
 
-pub fn prepare() -> Config {
-    dotenv().ok();
-    let config = match envy::from_env::<Config>() {
-        Ok(val) => val,
-        Err(error) => panic!("{:#?}", error),
-    };
-    config
+impl Config {
+    pub fn prepare() -> Config {
+        dotenv().ok();
+        let config = match envy::from_env::<Config>() {
+            Ok(val) => val,
+            Err(error) => panic!("{:#?}", error),
+        };
+        config
+    }
 }

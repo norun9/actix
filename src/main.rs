@@ -12,7 +12,7 @@ mod schema;
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
-    let config = pkg::prepare();
+    let config = pkg::Config::prepare();
     let http = config.http;
     env_logger::init();
     let mut listenfd = ListenFd::from_env();

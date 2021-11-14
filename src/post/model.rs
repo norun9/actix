@@ -27,8 +27,8 @@ pub struct UpdatePost {
     pub body: String,
 }
 
-type IndexResult = Result<Vec<Self>, pkg::InternalError>;
-type FindResult = Result<Self, pkg::InternalError>;
+type IndexResult = Result<Vec<Post>, pkg::InternalError>;
+type FindResult = Result<Post, pkg::InternalError>;
 type DeleteResult = Result<usize, pkg::InternalError>;
 
 impl Post {
